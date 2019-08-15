@@ -114,12 +114,7 @@ header inPackage name cf = unlines
     , "{"
     , "  return 1;"
     , "}"
-    , "void " ++ ns ++ "yyerror(const char *str)"
-    , "{"
-    , "  extern char *"++ns++"yytext;"
-    , "  fprintf(stderr,\"error: line %d: %s at %s\\n\", "
-    , "    "++ns++"yy_mylinenumber, str, "++ns++"yytext);"
-    , "}"
+    , "void " ++ ns ++ "yyerror(const char *str);"
     , ""
     , definedRules cf
     , nsStart inPackage
