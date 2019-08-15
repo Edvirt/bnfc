@@ -59,7 +59,7 @@ cf2flex inPackage name cf = (unlines
    env = makeSymEnv (cfgSymbols cf ++ reservedWords cf) (0 :: Int)
    env' = env ++ (makeSymEnv (tokenNames cf) (length env))
    makeSymEnv [] _ = []
-   makeSymEnv (s:symbs) n = (s, nsDefine inPackage "_SYMB_" ++ (show n)) : (makeSymEnv symbs (n+1))
+   makeSymEnv (s:symbs) n = (s, nsDefine inPackage "SYMB_" ++ (show n)) : (makeSymEnv symbs (n+1))
 
 prelude :: Maybe String -> String -> String
 prelude inPackage _ = unlines
@@ -101,12 +101,12 @@ restOfFlex inPackage cf env = concat
    userDefTokens,
    ifC catString strStates,
    ifC catChar chStates,
-   ifC catDouble ("<YYINITIAL>{DIGIT}+\".\"{DIGIT}+(\"e\"(\\-)?{DIGIT}+)?      \t " ++ ns ++ "yylval.double_ = atof(yytext); return " ++ nsDefine inPackage "_DOUBLE_" ++ ";\n"),
-   ifC catInteger ("<YYINITIAL>{DIGIT}+      \t " ++ ns ++ "yylval.int_ = atoi(yytext); return " ++ nsDefine inPackage "_INTEGER_" ++ ";\n"),
-   ifC catIdent ("<YYINITIAL>{LETTER}{IDENT}*      \t " ++ ns ++ "yylval.string_ = strdup(yytext); return " ++ nsDefine inPackage "_IDENT_" ++ ";\n"),
+   ifC catDouble ("<YYINITIAL>{DIGIT}+\".\"{DIGIT}+(\"e\"(\\-)?{DIGIT}+)?      \t " ++ ns ++ "yylval.double_ = atof(yytext); return " ++ nsDefine inPackage "SYM_DOUBLE_" ++ ";\n"),
+   ifC catInteger ("<YYINITIAL>{DIGIT}+      \t " ++ ns ++ "yylval.int_ = atoi(yytext); return " ++ nsDefine inPackage "SYM_INTEGER_" ++ ";\n"),
+   ifC catIdent ("<YYINITIAL>{LETTER}{IDENT}*      \t " ++ ns ++ "yylval.string_ = strdup(yytext); return " ++ nsDefine inPackage "SYM_IDENT_" ++ ";\n"),
    "\\n  ++" ++ ns ++ "yy_mylinenumber ;\n",
    "<YYINITIAL>[ \\t\\r\\n\\f]      \t /* ignore white space. */;\n",
-   "<YYINITIAL>.      \t return " ++ nsDefine inPackage "_ERROR_" ++ ";\n",
+   "<YYINITIAL>.      \t return " ++ nsDefine inPackage "SYM_ERROR_" ++ ";\n",
    "%%\n",
    footer
   ]
@@ -123,7 +123,7 @@ restOfFlex inPackage cf env = concat
     [
      "<YYINITIAL>\"\\\"\"      \t BEGIN STRING;",
      "<STRING>\\\\      \t BEGIN ESCAPED;",
-     "<STRING>\\\"      \t " ++ ns ++ "yylval.string_ = strdup(YY_PARSED_STRING); YY_BUFFER_RESET(); BEGIN YYINITIAL; return " ++ nsDefine inPackage "_STRING_" ++ ";",
+     "<STRING>\\\"      \t " ++ ns ++ "yylval.string_ = strdup(YY_PARSED_STRING); YY_BUFFER_RESET(); BEGIN YYINITIAL; return " ++ nsDefine inPackage "SYM_STRING_" ++ ";",
      "<STRING>.      \t YY_BUFFER_APPEND(yytext);",
      "<ESCAPED>n      \t YY_BUFFER_APPEND(\"\\n\"); BEGIN STRING;",
      "<ESCAPED>\\\"      \t YY_BUFFER_APPEND(\"\\\"\"); BEGIN STRING ;",
@@ -135,10 +135,10 @@ restOfFlex inPackage cf env = concat
     [
      "<YYINITIAL>\"'\" \tBEGIN CHAR;",
      "<CHAR>\\\\      \t BEGIN CHARESC;",
-     "<CHAR>[^']      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = yytext[0]; return " ++ nsDefine inPackage "_CHAR_" ++ ";",
-     "<CHARESC>n      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = '\\n'; return " ++ nsDefine inPackage "_CHAR_" ++ ";",
-     "<CHARESC>t      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = '\\t'; return " ++ nsDefine inPackage "_CHAR_" ++ ";",
-     "<CHARESC>.      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = yytext[0]; return " ++ nsDefine inPackage "_CHAR_" ++ ";",
+     "<CHAR>[^']      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = yytext[0]; return " ++ nsDefine inPackage "SYM_CHAR_" ++ ";",
+     "<CHARESC>n      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = '\\n'; return " ++ nsDefine inPackage "SYM_CHAR_" ++ ";",
+     "<CHARESC>t      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = '\\t'; return " ++ nsDefine inPackage "SYM_CHAR_" ++ ";",
+     "<CHARESC>.      \t BEGIN CHAREND; " ++ ns ++ "yylval.char_ = yytext[0]; return " ++ nsDefine inPackage "SYM_CHAR_" ++ ";",
      "<CHAREND>\"'\"      \t BEGIN YYINITIAL;"
     ]
    footer = unlines

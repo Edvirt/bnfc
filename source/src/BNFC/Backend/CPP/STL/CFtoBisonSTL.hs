@@ -79,7 +79,7 @@ cf2Bison rp inPackage name cf env
     [header inPackage name cf,
      render $ union inPackage (map TokenCat (positionCats cf) ++ allCats cf),
      maybe "" (\ns -> "%define api.prefix {" ++ ns ++ "yy}") inPackage,
-     "%token _ERROR_",
+     "%token SYM_ERROR_",
      tokens user env,
      declarations cf,
      startSymbol cf,
@@ -102,7 +102,6 @@ header inPackage name cf = unlines
     , "#include <string.h>"
     , "#include <algorithm>"
     , "#include \"Absyn.H\""
-    , "#undef _STRING_"
     , "typedef struct yy_buffer_state *YY_BUFFER_STATE;"
     , "int yyparse(void);"
     , "int yylex(void);"
@@ -289,11 +288,11 @@ tokens user = concatMap $ \ (s, r) ->
 
 specialToks :: CF -> String
 specialToks cf = concat [
-  ifC catString "%token<string_> _STRING_\n",
-  ifC catChar "%token<char_> _CHAR_\n",
-  ifC catInteger "%token<int_> _INTEGER_\n",
-  ifC catDouble "%token<double_> _DOUBLE_\n",
-  ifC catIdent "%token<string_> _IDENT_\n"
+  ifC catString "%token<string_> SYM_STRING_\n",
+  ifC catChar "%token<char_> SYM_CHAR_\n",
+  ifC catInteger "%token<int_> SYM_INTEGER_\n",
+  ifC catDouble "%token<double_> SYM_DOUBLE_\n",
+  ifC catIdent "%token<string_> SYM_IDENT_\n"
   ]
    where
     ifC cat s = if isUsedCat cf (TokenCat cat) then s else ""
@@ -398,9 +397,9 @@ varName :: Cat -> String
 varName = (++ "_") . map toLower . identCat . normCat
 
 typeName :: String -> String
-typeName "Ident" = "_IDENT_"
-typeName "String" = "_STRING_"
-typeName "Char" = "_CHAR_"
-typeName "Integer" = "_INTEGER_"
-typeName "Double" = "_DOUBLE_"
+typeName "Ident" = "SYM_IDENT_"
+typeName "String" = "SYM_STRING_"
+typeName "Char" = "SYM_CHAR_"
+typeName "Integer" = "SYM_INTEGER_"
+typeName "Double" = "SYM_DOUBLE_"
 typeName x = x

@@ -157,7 +157,7 @@ mkHeaderFile inPackage cf cats eps env = unlines
   concatMap mkFuncs eps,
   nsEnd inPackage,
   "",
-  "#define " ++ nsDefine inPackage "_ERROR_" ++ " 258",
+  "#define " ++ nsDefine inPackage "SYM_ERROR_" ++ " 258",
   mkDefines (259 :: Int) env,
   "extern " ++ nsScope inPackage ++ "YYSTYPE " ++ nsString inPackage ++ "yylval;",
   "",
@@ -171,19 +171,19 @@ mkHeaderFile inPackage cf cats eps env = unlines
   mkDefines n [] = mkString n
   mkDefines n ((_,s):ss) = "#define " ++ s +++ show n ++ "\n" ++ mkDefines (n+1) ss -- "nsDefine inPackage s" not needed (see cf2flex::makeSymEnv)
   mkString n =  if isUsedCat cf (TokenCat catString)
-   then ("#define " ++ nsDefine inPackage "_STRING_ " ++ show n ++ "\n") ++ mkChar (n+1)
+   then ("#define " ++ nsDefine inPackage "SYM_STRING_ " ++ show n ++ "\n") ++ mkChar (n+1)
    else mkChar n
   mkChar n =  if isUsedCat cf (TokenCat catChar)
-   then ("#define " ++ nsDefine inPackage "_CHAR_ " ++ show n ++ "\n") ++ mkInteger (n+1)
+   then ("#define " ++ nsDefine inPackage "SYM_CHAR_ " ++ show n ++ "\n") ++ mkInteger (n+1)
    else mkInteger n
   mkInteger n =  if isUsedCat cf (TokenCat catInteger)
-   then ("#define " ++ nsDefine inPackage "_INTEGER_ " ++ show n ++ "\n") ++ mkDouble (n+1)
+   then ("#define " ++ nsDefine inPackage "SYM_INTEGER_ " ++ show n ++ "\n") ++ mkDouble (n+1)
    else mkDouble n
   mkDouble n =  if isUsedCat cf (TokenCat catDouble)
-   then ("#define " ++ nsDefine inPackage "_DOUBLE_ " ++ show n ++ "\n") ++ mkIdent(n+1)
+   then ("#define " ++ nsDefine inPackage "SYM_DOUBLE_ " ++ show n ++ "\n") ++ mkIdent(n+1)
    else mkIdent n
   mkIdent n =  if isUsedCat cf (TokenCat catIdent)
-   then "#define " ++ nsDefine inPackage "_IDENT_ " ++ show n ++ "\n"
+   then "#define " ++ nsDefine inPackage "SYM_IDENT_ " ++ show n ++ "\n"
    else ""
   mkFuncs s = identCat (normCat s) ++ "*" +++ "p" ++ identCat s ++ "(FILE *inp);\n" ++
               identCat (normCat s) ++ "*" +++ "p" ++ identCat s ++ "(const char *str);\n"
