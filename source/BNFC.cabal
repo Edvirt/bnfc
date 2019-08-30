@@ -64,7 +64,7 @@ Executable bnfc
   build-tools:         alex, happy
   Main-is: Main.hs
   HS-source-dirs: compat src
-  ghc-options:     -W
+  ghc-options:     -W -O2
   extensions:
     FlexibleContexts
     LambdaCase
